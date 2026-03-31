@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>EARTH Insights</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"/>
+
+<style>
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: #eef2f7;
+}
+
+/* Header */
+header {
+  background: linear-gradient(90deg, #0b3d91, #1e90ff);
+  color: white;
+  padding: 15px;
+  text-align: center;
+  font-size: 22px;
+  font-weight: bold;
+}
+
+/* Dashboard Controls */
+.controls {
+  display: flex;
+  gap: 15px;
+  padding: 15px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* Cards */
+.panel {
+  background: white;
+  padding: 12px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  transition: 0.3s;
+}
+
+.panel:hover {
+  transform: scale(1.05);
+}
+
+/* Map */
+#map {
+  height: 65vh;
+}
+
+/* Buttons */
+button {
+  padding: 8px 12px;
+  border: none;
+  background: #1e90ff;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #0b3d91;
+}
+
+/* Data Panel */
+#dataPanel {
+  margin: 15px;
+  padding: 15px;
+  border-radius: 10px;
+  background: white;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+/* Legend */
+.legend {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  background: white;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  box-shadow: 0 0 5px rgba(0,0,0,0.3);
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  🌍 EARTH Insights - Smart Earth Monitoring
+  <button onclick="logout()" style="float:right; margin-right:20px;">Logout</button>
+  
+
+</header>
+
+<div class="controls">
+
+  <div class="panel">
+    <label>🌐 Data Layer:</label><br>
+    <select id="layerSelect">
+      <option value="default">Default</option>
+      <option value="flood">Flood Risk</option>
+      <option value="vegetation">Vegetation</option>
+      <option value="drought">Drought</option>
+      <option value="volcono">Volcano</option>
+      <option value="water_level">Water_level</option>
+      <option value="desertification">desertification</option>
+      
+      
+      
+    </select>
+  </div>
+
+  <div class="panel">
+    <label>📅 Time:</label><br>
+    <input type="range" min="-12" max="12" value="0" id="timeSlider">
+    <span id="timeValue">Month: 0</span>
+  </div>
+
+  <div class="panel">
+    <button onclick="getData()">📊 Analyze</button>
+  </div>
+
+  <div class="panel">
+    <button onclick="resetMap()">🔄 Reset</button>
+  </div>
+
+</div>
+
+<div id="map"></div>
+
+<div id="dataPanel">
+  <h3>📊 Insights Panel</h3>
+  <p>Select an area and click Analyze</p>
+</div>
+
+<div class="legend">
+  <b>Legend</b><br>
+  🔴 High Risk<br>
+  🟠 Medium Risk<br>
+  🟢 Low Risk
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+
+<script>
+var map = L.map('map').setView([28.6, 77.2], 5);
+
+let baseLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+let currentLayer;
+let selectedArea = null;
+
+// Area selection
+map.on('click', function(e) {
+  if (selectedArea) map.removeLayer(selectedArea);
+
+  selectedArea = L.circle(e.latlng, {
+    radius: 50000,
+    color: 'red'
+  }).addTo(map);
+});
+
+// Time slider
+const slider = document.getElementById("timeSlider");
+slider.oninput = function() {
+  document.getElementById("timeValue").innerText = "Month: " + this.value;
+};
+
+// Layer change
+document.getElementById("layerSelect").addEventListener("change", function() {
+  if (currentLayer) map.removeLayer(currentLayer);
+
+  switch(this.value) {
+    case "flood":
+      currentLayer = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png');
+      break;
+    case "vegetation":
+      currentLayer = L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png');
+      break;
+    case "drought":
+      currentLayer = L.tileLayer('https://{s}.tile.stamen.com/terrain/{z}/{x}/{y}.jpg');
+      break;
+    case "volcano":
+      currentLayer = L.tileLayer('https://{s}.tile.stamen.com/toner/{z}/{x}/{y}.png');
+      break;
+    default:
+      currentLayer = baseLayer;
+  }
+
+  currentLayer.addTo(map);
+});
+
+// Analyze data
+function getData() {
+  if (!selectedArea) {
+    alert("Select area first!");
+    return;
+  }
+
+  let layer = document.getElementById("layerSelect").value;
+
+  let result = "";
+
+  if(layer === "flood") result = "Flood Risk: Medium 🌊";
+  else if(layer === "vegetation") result = "Vegetation Index: 0.65 🌱";
+  else if(layer === "drought") result = "Drought Level: High 🔥";
+  else if(layer === "volcano") result = "Volcanic Activity: Low 🌋";
+  else result = "General Earth Data Loaded";
+
+  document.getElementById("dataPanel").innerHTML = `
+    <h3>📊 Insights</h3>
+    <p>${result}</p>
+    <p>Soil Moisture: Moderate</p>
+    <p>Trend: Stable</p>
+  `;
+}
+
+// Reset map
+function resetMap() {
+  if (selectedArea) map.removeLayer(selectedArea);
+  document.getElementById("dataPanel").innerHTML = "<h3>📊 Insights Panel</h3><p>Reset done</p>";
+}
+function logout() {
+  window.location.href = "index.html";
+}
+function logout() {
+  alert("Logout clicked");
+  window.location.href = "index.html";
+}
+function logout() {
+  window.location.replace("index.html");
+}
+</script>
+
+</body>
+</html>

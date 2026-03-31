@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>EARTH Insights</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial;
+  background: linear-gradient(to right, #0b3d91, #1e90ff);
+  color: white;
+  text-align: center;
+}
+
+.container {
+  margin-top: 100px;
+}
+
+h1 {
+  font-size: 40px;
+}
+
+p {
+  font-size: 18px;
+}
+
+button {
+  padding: 12px 20px;
+  margin: 10px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.login-btn {
+  background: white;
+  color: #0b3d91;
+}
+
+.demo-btn {
+  background: #ffcc00;
+}
+
+button:hover {
+  transform: scale(1.1);
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <h1>🌍 EARTH Insights</h1>
+  <p>Smart Earth Monitoring & Environmental Analysis Platform</p>
+
+  <button class="login-btn" onclick="goLogin()">🔐 Login</button>
+  <button class="demo-btn" onclick="goDashboard()">🚀 View Demo</button>
+</div>
+
+<script>
+function goLogin() {
+  window.location.href = "login.html";
+}
+
+function goDashboard() {
+  window.location.href = "dashboard.html";
+}
+</script>
+
+</body>
+</html>
